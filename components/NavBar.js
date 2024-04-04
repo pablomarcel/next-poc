@@ -8,7 +8,13 @@ export default function Navbar() {
                 <button className="nav-button">Get Users</button>
             </Link>
             <Link href="/add-user" passHref>
-                <button className="nav-button">Add New User</button>
+                <button className="nav-button">Add User</button>
+            </Link>
+            <Link href="/update-user" passHref>
+                <button className="nav-button">Update User</button>
+            </Link>
+            <Link href="/delete-user" passHref>
+                <button className="nav-button">Delete User</button>
             </Link>
             <style jsx>{`
                 .navbar {

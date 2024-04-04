@@ -12,6 +12,8 @@ const typeDefs = gql`
 
   type Mutation {
     addUser(name: String!, email: String!): User!
+    updateUser(id: ID!, name: String, email: String): User
+    deleteUser(id: ID!): User
   }
 
   type Query {
@@ -42,6 +44,39 @@ const resolvers = {
             } catch (e) {
                 console.error(e.stack);
                 throw new Error('Failed to add user');
+            }
+        },
+        updateUser: async (_, { id, name, email }) => {
+            try {
+                const fields = [];
+                const values = [];
+                if (name) {
+                    fields.push('name');
+                    values.push(name);
+                }
+                if (email) {
+                    fields.push('email');
+                    values.push(email);
+                }
+                const setClause = fields.map((field, index) => `${field} = $${index + 2}`).join(', ');
+                const { rows } = await pool.query(
+                    `UPDATE users SET ${setClause} WHERE id = $1 RETURNING *`,
+                    [id, ...values]
+                );
+                return rows[0] || null;
+            } catch (e) {
+                console.error(e.stack);
+                throw new Error('Failed to update user');
+            }
+        },
+        deleteUser: async (_, { id }) => {
+            try {
+                const deleteQuery = 'DELETE FROM users WHERE id = $1 RETURNING *';
+                const response = await pool.query(deleteQuery, [id]);
+                return response.rows[0] || null;
+            } catch (e) {
+                console.error(e.stack);
+                throw new Error('Failed to delete user');
             }
         },
     },
